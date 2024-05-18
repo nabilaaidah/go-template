@@ -14,3 +14,5 @@ type (
 		Password string `json:"password"`
 	}
 )
+
+var Register_Successful = "Registration was successful"

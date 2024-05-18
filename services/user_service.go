@@ -36,6 +36,7 @@ func NewUserService() UserService {
 
 func (s *userService) CreateUser(registerReq *dto.RegisterForm) error {
 	newUser := models.User{
+		ID:        uuid.New(),
 		Name:      registerReq.Name,
 		Username:  registerReq.Username,
 		Email:     registerReq.Email,

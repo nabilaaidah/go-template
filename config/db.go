@@ -38,7 +38,7 @@ func InitDB() *gorm.DB {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&models.User{}) // , &models.Theater{}, &models.Screening{}, , &models.Employee{}
+	err = db.AutoMigrate(&models.User{}, &models.Token{}) // , &models.Theater{}, &models.Screening{}, , &models.Employee{}
 
 	if err != nil {
 		panic(err)

@@ -19,7 +19,8 @@ type authController struct {
 
 func NewAuthController() *authController {
 	return &authController{
-		userService: services.NewUserService(),
+		userService:  services.NewUserService(),
+		tokenService: services.NewTokenService(),
 	}
 }
 
@@ -55,7 +56,10 @@ func (a *authController) Register(c echo.Context) error {
 		return echo.ErrInternalServerError
 	}
 
-	return c.String(http.StatusCreated, "Registration was successful")
+	return c.JSON(http.StatusCreated, map[string]string{
+		"status":  "success",
+		"message": dto.Register_Successful,
+	})
 }
 
 func (a *authController) Login(c echo.Context) error {
@@ -72,21 +76,21 @@ func (a *authController) Login(c echo.Context) error {
 		user, err = a.userService.GetUserByUsername(loginReq.Username)
 	}
 	if err != nil {
-		return echo.ErrInternalServerError
+		return c.String(http.StatusInternalServerError, "Error retrieving user.")
 	}
 
 	if user == nil {
-		return echo.ErrUnauthorized
+		return c.String(http.StatusUnauthorized, "User not found.")
 	}
 
 	if utils.ValidatePassword(user.Password, loginReq.Password) {
 		token, err := middleware.GenerateTokenPair(user)
 		if err != nil {
-			return echo.ErrInternalServerError
+			return c.String(http.StatusInternalServerError, "Error generating token.")
 		}
 		err = a.tokenService.SaveToken(user, token)
 		if err != nil {
-			return echo.ErrInternalServerError
+			return c.String(http.StatusInternalServerError, "Error saving token.")
 		}
 		var loginmessage string
 
@@ -97,6 +101,7 @@ func (a *authController) Login(c echo.Context) error {
 		}
 
 		return c.JSON(http.StatusOK, map[string]string{
+			"status":  "success",
 			"message": loginmessage,
 			"token":   token,
 		})

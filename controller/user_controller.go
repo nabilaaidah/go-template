@@ -15,7 +15,8 @@ type userController struct {
 
 func NewUserController() *userController {
 	return &userController{
-		UserService: services.NewUserService(),
+		UserService:  services.NewUserService(),
+		TokenService: services.NewTokenService(),
 	}
 }
 
@@ -24,7 +25,11 @@ func (u *userController) GetUserByToken(c echo.Context) error {
 	if err != nil {
 		return echo.ErrUnauthorized
 	} else {
-		return c.JSON(http.StatusOK, user)
+		response := map[string]interface{}{
+			"status": "success",
+			"user":   user,
+		}
+		return c.JSON(http.StatusOK, response)
 	}
 }
 
@@ -40,7 +45,12 @@ func (u *userController) UpdateUser(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, updatedUser)
+	response := map[string]interface{}{
+		"status":  "success",
+		"message": "user updated",
+		"user":    updatedUser,
+	}
+	return c.JSON(http.StatusOK, response)
 }
 
 func (u *userController) DeleteUser(c echo.Context) error {
@@ -49,7 +59,11 @@ func (u *userController) DeleteUser(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "error in removing user")
 	}
 
-	return c.String(http.StatusOK, "account removed successfully")
+	response := map[string]interface{}{
+		"status":  "success",
+		"message": "account removed successfully",
+	}
+	return c.JSON(http.StatusOK, response)
 }
 
 func (u *userController) Logout(c echo.Context) error {
@@ -57,6 +71,10 @@ func (u *userController) Logout(c echo.Context) error {
 	if err != nil {
 		return err
 	} else {
-		return c.String(http.StatusOK, "Logout was successful")
+		response := map[string]interface{}{
+			"status":  "success",
+			"message": "Logout was successful",
+		}
+		return c.JSON(http.StatusOK, response)
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"golang-template/models"
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -24,7 +25,7 @@ func NewTokenRepositoryGORM() *TokenRepositoryGORM {
 }
 
 func (repo *TokenRepositoryGORM) SaveToken(user *models.User, token string) error {
-	AccessToken := models.Token{UserId: user.ID.String(), Token: token, ExpiresAt: time.Now().Add(time.Hour * 24)}
+	AccessToken := models.Token{ID: uuid.New(), UserId: user.ID, Token: token, ExpiresAt: time.Now().Add(time.Hour * 24)}
 	result := repo.db.Create(&AccessToken)
 
 	return result.Error
@@ -38,7 +39,7 @@ func (repo *TokenRepositoryGORM) UserByToken(token string) (*models.User, error)
 	if err != nil {
 		return nil, err
 	}
-	err = repo.db.Where("id = ?", AccessToken.UserId).First(&User).Error
+	err = repo.db.Select("id", "username", "name", "email", "role", "created_at", "updated_at").Where("id = ?", AccessToken.UserId).First(&User).Error
 	if err != nil {
 		return nil, err
 	}

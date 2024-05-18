@@ -31,14 +31,14 @@ func GetToken(c echo.Context) string {
 	auth, exists := c.Request().Header["Authorization"]
 	if !exists || len(auth) == 0 {
 		fmt.Println("Error: Authorization header is missing or empty")
-		return "make sure token is correct"
+		return ""
 	}
 
 	Bearer := auth[0]
 	tokenParts := strings.Split(Bearer, "Bearer ")
 	if len(tokenParts) != 2 {
 		fmt.Println("Error: Invalid Bearer token format")
-		return "make sure token is correct"
+		return ""
 	}
 
 	token := tokenParts[1]
