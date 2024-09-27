@@ -28,16 +28,16 @@ func SeederUser(db *gorm.DB) {
 	json.Unmarshal(byteValue, &users)
 
 	for _, user := range users {
-		user.ID = uuid.New() // Generate new UUID
-		user.Password, err = utils.HashPassword(user.Password)
+		user.User_id = uuid.New().String() // Generate new UUID
+		user.User_password, err = utils.HashPassword(user.User_password)
 		if err != nil {
-			log.Printf("Could not hash password for user %s: %v", user.Username, err)
+			log.Printf("Could not hash password for user %s: %v", user.User_username, err)
 		}
 		user.CreatedAt = time.Now() // Set current time for CreatedAt
 		user.UpdatedAt = time.Now() // Set current time for UpdatedAt
 
 		if err := db.Create(&user).Error; err != nil {
-			log.Printf("Could not seed user %s: %v", user.Username, err)
+			log.Printf("Could not seed user %s: %v", user.User_username, err)
 		}
 	}
 

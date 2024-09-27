@@ -36,21 +36,21 @@ func NewUserService() UserService {
 
 func (s *userService) CreateUser(registerReq *dto.RegisterForm) error {
 	newUser := models.User{
-		ID:        uuid.New(),
-		Name:      registerReq.Name,
-		Username:  registerReq.Username,
-		Email:     registerReq.Email,
-		Password:  registerReq.Password,
-		Role:      "customer",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		User_id:       uuid.New().String(),
+		User_name:     registerReq.Name,
+		User_username: registerReq.Username,
+		User_email:    registerReq.Email,
+		User_password: registerReq.Password,
+		User_role:     "3",
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
-	hashed, err := utils.HashPassword(newUser.Password)
+	hashed, err := utils.HashPassword(newUser.User_password)
 	if err != nil {
 		return err
 	}
-	newUser.Password = hashed
+	newUser.User_password = hashed
 	return s.userRepo.CreateUser(&newUser)
 }
 
@@ -72,27 +72,27 @@ func (s *userService) UpdateUser(updateForm *dto.RegisterForm, c echo.Context) (
 		return nil, c.String(http.StatusUnauthorized, "Unauthorized")
 	}
 
-	existingUser, err := s.userRepo.GetUserById(tokenUser.ID)
+	existingUser, err := s.userRepo.GetUserById(uuid.MustParse(tokenUser.User_id))
 	if err != nil {
 		return nil, c.String(http.StatusInternalServerError, "error retrieving user")
 	}
 
 	if updateForm.Name != "" {
-		existingUser.Name = updateForm.Name
+		existingUser.User_name = updateForm.Name
 	}
 
 	if updateForm.Username != "" {
 		if _, err := s.userRepo.GetUserByUsername(updateForm.Username); err == nil {
 			return nil, c.String(http.StatusBadRequest, "username already exists")
 		}
-		existingUser.Username = updateForm.Username
+		existingUser.User_username = updateForm.Username
 	}
 
 	if updateForm.Email != "" {
 		if _, err := s.userRepo.GetUserByEmail(updateForm.Email); err == nil {
 			return nil, c.String(http.StatusBadRequest, "email already exists")
 		}
-		existingUser.Email = updateForm.Email
+		existingUser.User_email = updateForm.Email
 	}
 
 	if updateForm.Password != "" {
@@ -103,7 +103,7 @@ func (s *userService) UpdateUser(updateForm *dto.RegisterForm, c echo.Context) (
 		if err != nil {
 			return nil, c.String(http.StatusInternalServerError, "error hashing password")
 		}
-		existingUser.Password = hashedPassword
+		existingUser.User_password = hashedPassword
 	}
 	return s.userRepo.UpdateUser(existingUser)
 }
@@ -114,11 +114,11 @@ func (s *userService) DeleteUser(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "Unauthorized")
 	}
 
-	existingUser, err := s.userRepo.GetUserById(tokenUser.ID)
+	existingUser, err := s.userRepo.GetUserById(uuid.MustParse(tokenUser.User_id))
 	if err != nil {
 		return c.String(http.StatusInternalServerError, "error retrieving user")
 	}
-	return s.userRepo.DeleteUser(existingUser.ID)
+	return s.userRepo.DeleteUser(uuid.MustParse(existingUser.User_id))
 }
 
 func (s *userService) Logout(c echo.Context) error {

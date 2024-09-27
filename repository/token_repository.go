@@ -25,7 +25,7 @@ func NewTokenRepositoryGORM() *TokenRepositoryGORM {
 }
 
 func (repo *TokenRepositoryGORM) SaveToken(user *models.User, token string) error {
-	AccessToken := models.Token{ID: uuid.New(), UserId: user.ID, Token: token, ExpiresAt: time.Now().Add(time.Hour * 24)}
+	AccessToken := models.Token{ID: uuid.New(), UserId: uuid.MustParse(user.User_id), Token: token, ExpiresAt: time.Now().Add(time.Hour * 24)}
 	result := repo.db.Create(&AccessToken)
 
 	return result.Error

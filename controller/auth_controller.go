@@ -83,7 +83,7 @@ func (a *authController) Login(c echo.Context) error {
 		return c.String(http.StatusUnauthorized, "User not found.")
 	}
 
-	if utils.ValidatePassword(user.Password, loginReq.Password) {
+	if utils.ValidatePassword(user.User_password, loginReq.Password) {
 		token, err := middleware.GenerateTokenPair(user)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, "Error generating token.")
@@ -94,7 +94,7 @@ func (a *authController) Login(c echo.Context) error {
 		}
 		var loginmessage string
 
-		if user.Role == "customer" {
+		if user.User_role == "3" {
 			loginmessage = "You are logged in as customer"
 		} else {
 			loginmessage = "You are logged in as admin"
